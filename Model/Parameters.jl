@@ -1,16 +1,16 @@
 # Parameter processing 
 
 # Hospital level multiplier
-level_multiplier = Dict(1 => 10, 2 => 8, 3 => 6, 4 => 4, 5 => 2)
+level_multiplier = Dict(1 => 1, 2 => 4, 3 => 10, 4 => 20)
 
 # Calculate scores S_l,k
 S = Dict()
 for location in eachrow(locations)
-    for k in 1:5  # Assuming 5 levels of hospitals
+    for k in 1:nrow(hospital_levels)  # Assuming 5 levels of hospitals
         total_score = 0.0
         for cluster in eachrow(population_clusters)
-            dist = haversine(location.Latitude, location.Longitude, cluster.Latitude, cluster.Longitude)
-            dist_score = score_by_distance(dist)
+            distance = haversine(location.Latitude, location.Longitude, cluster.Latitude, cluster.Longitude)
+            dist_score = score_by_distance(distance)
             weighted_score = dist_score * cluster.Elderly_Rate * cluster.Total_Population
             total_score += weighted_score
         end
@@ -41,10 +41,10 @@ for l in 1:num_locations
 end
 
 # Distance thresholds for each level
-distance_thresholds = Dict(1 => 6000, 2 => 5000, 3 => 4000, 4 => 3000, 5 => 2000)
+distance_thresholds = Dict(1 => 2000, 2 => 5000, 3 => 10000, 4 => 15000)
 
 # Initialize justification matrices for each level
-justification_matrices = Dict(k => zeros(Bool, num_locations, num_locations) for k in 1:5)
+justification_matrices = Dict(k => zeros(Bool, num_locations, num_locations) for k in 1:nrow(hospital_levels))
 
 # Populate the justification matrices using the distance matrix
 for k in keys(justification_matrices)
@@ -72,7 +72,7 @@ for l in 1:num_locations
 end
 
 # Threshold for the justification matrix (Assume 20km now)
-distance_threshold = 20000
+distance_threshold = 1000000
 
 # Initialize the justification matrix
 justification_matrix = zeros(Bool, num_locations, num_population_clusters)
@@ -87,9 +87,10 @@ end
 
 
 # Minimum ratio requirements
-ratio_level_1 = 0.1 # Assume Level 1 facilities should be at least 10% of all new facilities
+ratio_level_1 = 0.2 # Assume Level 1 facilities should be at least 10% of all new facilities
 ratio_level_2 = 0.1 # Assume Level 2 facilities should be at least 10% of all new facilities
 
 
+
 # Capacity factor
-Capacity_factor = 1000  # Assumed value
+Capacity_factor = 10000000  # Assumed value

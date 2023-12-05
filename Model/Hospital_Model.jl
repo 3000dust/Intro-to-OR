@@ -1,6 +1,6 @@
 # Hospital Model
 
-function Hospital_model()
+function Hospital_model(B)
     # Initialize JuMP model with Gurobi solver
     model = Model(Gurobi.Optimizer)
     
@@ -32,12 +32,13 @@ function Hospital_model()
 
     # Min Ratio Constraint
     @constraint(model, sum(b[l, 1] for l in 1:nrow(locations)) >= ratio_level_1 * sum(b[l, j] for l in 1:nrow(locations), j in 1:nrow(hospital_levels)))
-    @constraint(model, sum(b[l, 2] for l in 1:nrow(locations)) >= ratio_level_2 * sum(b[l, j] for l in 1:nrow(locations), j in 1:nrow(hospital_levels)))
+    # @constraint(model, sum(b[l, 2] for l in 1:nrow(locations)) >= ratio_level_2 * sum(b[l, j] for l in 1:nrow(locations), j in 1:nrow(hospital_levels)))
 
-    # Capacity Contraint for Each Population Cluster
-    for p in 1:nrow(population_clusters)
-        @constraint(model, sum(justification_matrix[l, p] * Capacity_factor * sum(hospital_levels.Bed_Capacity[k] * b[l, k] for k in 1:nrow(hospital_levels)) for l in 1:nrow(locations)) >= population_clusters.Total_Population[p])
-    end
+
+    # # Capacity Contraint for Each Population Cluster
+    # for p in 1:nrow(population_clusters)
+    #     @constraint(model, sum(justification_matrix[l, p] * Capacity_factor * sum(hospital_levels.Bed_Capacity[k] * b[l, k] for k in 1:nrow(hospital_levels)) for l in 1:nrow(locations)) >= population_clusters.Total_Population[p])
+    # end
 
     # Area Constraint
     for l in 1:nrow(locations)
@@ -66,5 +67,13 @@ function Hospital_model()
     println("Total Score: ", total_score)
     println("Total Cost: ", total_cost)
 
-    return model
+    # Record the solution
+    df_summary = DataFrame(
+        "Total Cost" => [total_cost],
+        "Total Score" => [total_score]
+    )
+
+    hospital_list = [(l, k) for l in 1:nrow(locations), k in 1:nrow(hospital_levels) if value(b[l, k]) > 0.5]
+    df_hospitals = DataFrame(hospital_list, [:Location, :Level])
+    return df_summary, df_hospitals
 end

@@ -1,5 +1,12 @@
 # Create necessary functions used in the model
 
+# Function to check if the path is existing
+function checkpath()
+    isdir(modelpath) || mkdir(modelpath)
+    isdir(inputpath) || mkdir(inputpath)
+    isdir(outputpath) || mkdir(outputpath)
+end
+
 # Function to convert degrees to radians
 function deg2rad(deg)
     return deg * π / 180
@@ -39,4 +46,16 @@ function score_by_distance(distance)
     else
         return 1
     end
+end
+
+
+# Record result function
+function record_result(scenario, df_summary, df_hospitals, outputpath)
+    # Ensure the scenario directory exists
+    scenario_dir = joinpath(outputpath, scenario)
+    isdir(scenario_dir) || mkdir(scenario_dir)
+
+    # Write DataFrames to CSV
+    CSV.write(joinpath(scenario_dir, "summary.csv"), df_summary)
+    CSV.write(joinpath(scenario_dir, "hospitals.csv"), df_hospitals)
 end
