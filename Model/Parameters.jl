@@ -6,7 +6,7 @@ level_multiplier = Dict(1 => 1, 2 => 4, 3 => 10, 4 => 20)
 # Calculate scores S_l,k
 S = Dict()
 for location in eachrow(locations)
-    for k in 1:nrow(hospital_levels)  # Assuming 5 levels of hospitals
+    for k in 1:nrow(hospital_levels)  # Assuming 4 levels of hospitals
         total_score = 0.0
         for cluster in eachrow(population_clusters)
             distance = haversine(location.Latitude, location.Longitude, cluster.Latitude, cluster.Longitude)
@@ -21,7 +21,7 @@ end
 
 
 # Calculate leveling cost
-leveling_cost_per_sqm = 10 # Assume $10 per square meter
+leveling_cost_per_sqm = 59 # Assume $59 per square meter
 locations.Leveling_Cost = locations.Area_sqm .* leveling_cost_per_sqm
 
 
@@ -72,7 +72,7 @@ for l in 1:num_locations
 end
 
 # Threshold for the justification matrix (Assume 20km now)
-distance_threshold = 1000000
+distance_threshold = 20000
 
 # Initialize the justification matrix
 justification_matrix = zeros(Bool, num_locations, num_population_clusters)
@@ -87,10 +87,11 @@ end
 
 
 # Minimum ratio requirements
-ratio_level_1 = 0.2 # Assume Level 1 facilities should be at least 10% of all new facilities
+ratio_level_1 = 0.2 # Assume Level 1 facilities should be at least 20% of all new facilities
 ratio_level_2 = 0.1 # Assume Level 2 facilities should be at least 10% of all new facilities
 
 
 
 # Capacity factor
-Capacity_factor = 10000000  # Assumed value
+Capacity_factor = 250 # 4 people will share 1000 beds
+Existing_hospital_capacity = Capacity_factor*6620 # Total 6620 beds for existing lv2,3,4 hospital

@@ -4,16 +4,20 @@ using JuMP, DataFrames, CSV, Gurobi, Missings, Plots
 modelpath = joinpath(@__DIR__, "..", "Model")
 inputpath = joinpath(@__DIR__, "..", "Data")
 outputpath = joinpath(@__DIR__, "..", "Results")
-checkpath()
+
 
 # Read CSV files
 locations = CSV.read(joinpath(inputpath, "Location.csv"), DataFrame)
 population_clusters = CSV.read(joinpath(inputpath, "Population_cluster.csv"), DataFrame)
 hospital_levels = CSV.read(joinpath(inputpath, "Hospital_level.csv"), DataFrame)
 
+# Include depency functions
 include(joinpath(modelpath, "Functions.jl"))
 include(joinpath(modelpath, "Parameters.jl"))
 include(joinpath(modelpath, "Hospital_Model.jl"))
+
+# Check if all path exist and valid
+checkpath()
 
 # Define the budget scenarios
 Budget = [1913062303 3826124607 9565311517]

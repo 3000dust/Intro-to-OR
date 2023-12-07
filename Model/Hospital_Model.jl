@@ -32,13 +32,13 @@ function Hospital_model(B)
 
     # Min Ratio Constraint
     @constraint(model, sum(b[l, 1] for l in 1:nrow(locations)) >= ratio_level_1 * sum(b[l, j] for l in 1:nrow(locations), j in 1:nrow(hospital_levels)))
-    # @constraint(model, sum(b[l, 2] for l in 1:nrow(locations)) >= ratio_level_2 * sum(b[l, j] for l in 1:nrow(locations), j in 1:nrow(hospital_levels)))
+     @constraint(model, sum(b[l, 2] for l in 1:nrow(locations)) >= ratio_level_2 * sum(b[l, j] for l in 1:nrow(locations), j in 1:nrow(hospital_levels)))
 
 
     # # Capacity Contraint for Each Population Cluster
-    # for p in 1:nrow(population_clusters)
-    #     @constraint(model, sum(justification_matrix[l, p] * Capacity_factor * sum(hospital_levels.Bed_Capacity[k] * b[l, k] for k in 1:nrow(hospital_levels)) for l in 1:nrow(locations)) >= population_clusters.Total_Population[p])
-    # end
+    for p in 1:nrow(population_clusters)
+         @constraint(model, sum(justification_matrix[l, p] * Capacity_factor * sum(hospital_levels.Bed_Capacity[k] * b[l, k] for k in 1:nrow(hospital_levels)) for l in 1:nrow(locations)) >= population_clusters.Total_Population[p]-Existing_hospital_capacity)
+     end
 
     # Area Constraint
     for l in 1:nrow(locations)
